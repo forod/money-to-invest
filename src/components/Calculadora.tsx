@@ -349,25 +349,40 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
             
             <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px' }}>
               <span style={{ fontSize: '32px', fontWeight: '300', color: 'var(--text-secondary)', marginRight: '8px', fontFamily: 'var(--font-title)' }}>{moneda.symbol}</span>
-              <input
-                id="input-ingresos"
-                className="font-outfit"
-                type="text"
-                value={ingresoStr}
-                onChange={handleIngresoChange}
-                placeholder="0"
-                maxLength={15} // Sufficient to fit 9 digits + commas + 2 decimals (9+2+2 = 13 total)
-                style={{ 
-                  background: 'transparent',
-                  border: 'none',
+              {capturing ? (
+                <div style={{ 
                   color: '#ffffff',
                   fontSize: ingresoStr.length > 8 ? '36px' : '48px',
                   fontWeight: '800',
-                  outline: 'none',
-                  width: '100%',
-                  padding: 0
-                }}
-              />
+                  fontFamily: 'var(--font-title)',
+                  lineHeight: '1.2',
+                  minHeight: '58px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  {ingresoStr || '0'}
+                </div>
+              ) : (
+                <input
+                  id="input-ingresos"
+                  className="font-outfit"
+                  type="text"
+                  value={ingresoStr}
+                  onChange={handleIngresoChange}
+                  placeholder="0"
+                  maxLength={15} // Sufficient to fit 9 digits + commas + 2 decimals (9+2+2 = 13 total)
+                  style={{ 
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontSize: ingresoStr.length > 8 ? '36px' : '48px',
+                    fontWeight: '800',
+                    outline: 'none',
+                    width: '100%',
+                    padding: 0
+                  }}
+                />
+              )}
             </div>
           </div>
 
@@ -423,18 +438,46 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
               {moneda.symbol} {formatWithCommas(montoInvertir.toFixed(2))}
             </h3>
             
-            <input 
-              id="slider-porcentaje-inversion"
-              type="range" 
-              min="10" 
-              max="75" 
-              value={porcentajeInversion}
-              onChange={(e) => setPorcentajeInversion(parseInt(e.target.value))}
-              style={{ 
-                background: 'rgba(5, 8, 12, 0.15)',
-                width: '100%'
-              }}
-            />
+            {capturing ? (
+              <div style={{ 
+                width: '100%', 
+                height: '6px', 
+                background: 'rgba(5, 8, 12, 0.15)', 
+                borderRadius: '3px',
+                position: 'relative',
+                margin: '22px 0 24px 0'
+              }}>
+                <div style={{
+                  width: `${(porcentajeInversion - 10) / (75 - 10) * 100}%`,
+                  height: '100%',
+                  background: '#05080c',
+                  borderRadius: '3px'
+                }} />
+                <div style={{
+                  position: 'absolute',
+                  left: `calc(${(porcentajeInversion - 10) / (75 - 10) * 100}% - 10px)`,
+                  top: '-7px',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  background: '#05080c',
+                  boxShadow: '0 0 10px rgba(0,0,0,0.3)'
+                }} />
+              </div>
+            ) : (
+              <input 
+                id="slider-porcentaje-inversion"
+                type="range" 
+                min="10" 
+                max="75" 
+                value={porcentajeInversion}
+                onChange={(e) => setPorcentajeInversion(parseInt(e.target.value))}
+                style={{ 
+                  background: 'rgba(5, 8, 12, 0.15)',
+                  width: '100%'
+                }}
+              />
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(5, 8, 12, 0.6)', marginTop: '8px', fontWeight: '600' }}>
               <span>Min (10%)</span>
               <span>Max (75%)</span>
@@ -478,24 +521,26 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                   {moneda.symbol} {formatWithCommas(etfs.toFixed(0))}
                 </span>
               </div>
-              <input
-                id="slider-etfs"
-                type="range"
-                min="0"
-                max="100"
-                value={percentEtfs}
-                onChange={(e) => handlePercentChange('etfs', parseInt(e.target.value))}
-                style={{ 
-                  position: 'absolute', 
-                  top: 0, 
-                  left: 0, 
-                  width: '100%', 
-                  height: '100%', 
-                  opacity: 0, 
-                  cursor: 'ew-resize',
-                  zIndex: 3
-                }}
-              />
+              {!capturing && (
+                <input
+                  id="slider-etfs"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={percentEtfs}
+                  onChange={(e) => handlePercentChange('etfs', parseInt(e.target.value))}
+                  style={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    left: 0, 
+                    width: '100%', 
+                    height: '100%', 
+                    opacity: 0, 
+                    cursor: 'ew-resize',
+                    zIndex: 3
+                  }}
+                />
+              )}
             </div>
 
             {/* Acciones */}
@@ -527,24 +572,26 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                   {moneda.symbol} {formatWithCommas(acciones.toFixed(0))}
                 </span>
               </div>
-              <input
-                id="slider-acciones"
-                type="range"
-                min="0"
-                max="100"
-                value={percentAcciones}
-                onChange={(e) => handlePercentChange('acciones', parseInt(e.target.value))}
-                style={{ 
-                  position: 'absolute', 
-                  top: 0, 
-                  left: 0, 
-                  width: '100%', 
-                  height: '100%', 
-                  opacity: 0, 
-                  cursor: 'ew-resize',
-                  zIndex: 3
-                }}
-              />
+              {!capturing && (
+                <input
+                  id="slider-acciones"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={percentAcciones}
+                  onChange={(e) => handlePercentChange('acciones', parseInt(e.target.value))}
+                  style={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    left: 0, 
+                    width: '100%', 
+                    height: '100%', 
+                    opacity: 0, 
+                    cursor: 'ew-resize',
+                    zIndex: 3
+                  }}
+                />
+              )}
             </div>
 
             {/* Cripto */}
@@ -576,24 +623,26 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                   {moneda.symbol} {formatWithCommas(cripto.toFixed(0))}
                 </span>
               </div>
-              <input
-                id="slider-cripto"
-                type="range"
-                min="0"
-                max="100"
-                value={percentCripto}
-                onChange={(e) => handlePercentChange('cripto', parseInt(e.target.value))}
-                style={{ 
-                  position: 'absolute', 
-                  top: 0, 
-                  left: 0, 
-                  width: '100%', 
-                  height: '100%', 
-                  opacity: 0, 
-                  cursor: 'ew-resize',
-                  zIndex: 3
-                }}
-              />
+              {!capturing && (
+                <input
+                  id="slider-cripto"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={percentCripto}
+                  onChange={(e) => handlePercentChange('cripto', parseInt(e.target.value))}
+                  style={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    left: 0, 
+                    width: '100%', 
+                    height: '100%', 
+                    opacity: 0, 
+                    cursor: 'ew-resize',
+                    zIndex: 3
+                  }}
+                />
+              )}
             </div>
 
             {/* Bloque Restante */}
@@ -610,6 +659,44 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
             </div>
           </div>
         </div>
+
+        {/* Desglose de Gastos Fijos (Visible en la captura y en la interfaz) */}
+        {gastos.length > 0 && (
+          <div className="card full-width-col" style={{ marginTop: '20px', padding: '24px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '700', letterSpacing: '0.5px', textTransform: 'uppercase', display: 'block', marginBottom: '16px' }}>
+              Detalle de Gastos ({periodo === 'mensual' ? 'Mensuales' : periodo === 'semanal' ? 'Semanales' : 'Diarios'})
+            </span>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+              gap: '16px 24px' 
+            }}>
+              {gastos.map((item) => {
+                const itemVal = parseFloat(item.value) || 0;
+                if (itemVal === 0) return null;
+                
+                let valueForPeriod = itemVal;
+                if (periodo === 'diario') {
+                  valueForPeriod = itemVal / 26;
+                } else if (periodo === 'semanal') {
+                  valueForPeriod = itemVal / 4;
+                }
+                
+                return (
+                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: '#ffffff' }}>{item.label}</span>
+                      <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{item.desc}</span>
+                    </div>
+                    <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent-blue)', fontFamily: 'var(--font-title)' }}>
+                      {moneda.symbol} {formatWithCommas(valueForPeriod.toFixed(0))}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
       </div>
       </div>
