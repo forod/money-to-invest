@@ -1,6 +1,7 @@
 import React, { useState, useContext, useMemo } from 'react';
 import { GastosContext } from '../context/GastosContext';
-import { Info } from 'lucide-react';
+import { Info, Camera } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 type Props = {
   onNavigateToGastos: () => void;
@@ -54,6 +55,31 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
   const [periodo, setPeriodo] = useState<'diario' | 'semanal' | 'mensual'>('mensual');
   const [porcentajeInversion, setPorcentajeInversion] = useState(31);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [capturing, setCapturing] = useState(false);
+
+  const handleDownloadScreenshot = async () => {
+    const element = document.getElementById('resumen-financiero');
+    if (!element) return;
+    setCapturing(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 150));
+      const canvas = await html2canvas(element, {
+        backgroundColor: '#05080c',
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `resumen-inversion-${periodo}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Error al generar la captura:', err);
+    } finally {
+      setCapturing(false);
+    }
+  };
 
   // Portfolio allocation state (adds up to 100%)
   const [percentEtfs, setPercentEtfs] = useState(60);
@@ -166,17 +192,46 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
 
   return (
     <div className="animate-fade-in">
-      {/* Floating Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '20px', color: 'var(--accent-green)', fontWeight: '800', letterSpacing: '1px' }}>
-          CALCULADORA
-        </h2>
-        <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <Info size={12} /> Modo Invitado
-        </span>
+      {/* Botón de Captura (fuera de la zona de captura) */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+        <button
+          id="btn-descargar-captura"
+          className="btn-secondary"
+          onClick={handleDownloadScreenshot}
+          disabled={capturing}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 16px',
+            fontSize: '13px',
+            borderColor: 'var(--accent-green)',
+            color: 'var(--accent-green)',
+            background: 'rgba(0, 255, 170, 0.03)',
+            cursor: 'pointer'
+          }}
+        >
+          <Camera size={15} />
+          {capturing ? 'Generando captura...' : 'Descargar Captura'}
+        </button>
       </div>
 
-      <div className="dashboard-grid">
+      {/* Zona de Captura */}
+      <div id="resumen-financiero" style={{ padding: '16px', background: 'var(--bg-color)', borderRadius: '24px' }}>
+        {/* Header de la captura */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ fontSize: '20px', color: 'var(--accent-green)', fontWeight: '800', letterSpacing: '1px', margin: 0 }}>
+              MONEY TO INVEST
+            </h2>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Resumen de Inversión y Gastos</span>
+          </div>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Info size={12} /> Modo Invitado
+          </span>
+        </div>
+
+        <div className="dashboard-grid">
         
         {/* COLUMNA IZQUIERDA: Entradas, Gastos y Margen de Inversión */}
         <div>
@@ -501,6 +556,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
           </div>
         </div>
 
+      </div>
       </div>
     </div>
   );
