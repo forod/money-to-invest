@@ -11,9 +11,13 @@ La herramienta se centra en cinco acciones fundamentales para ayudarte a cumplir
 ### 1. Registra tus ingresos
 Ingresa la cantidad de dinero bruto que percibes de forma rápida. Para mayor estabilidad, los montos están topados a un límite de 9 cifras enteras.
 
+![Paso 1: Registro de Ingresos](./assets/calculator_dashboard.png)
+
 ### 2. Agrega tus gastos mensuales y elige tu vista
 Configura tus compromisos financieros recurrentes (alquiler, comida, transporte, etc.) en la sección de Gastos Fijos.
 *   **Vistas Dinámicas (Diario, Semanal, Mensual):** En la pantalla principal, puedes alternar la vista entre diaria, semanal o mensual. Esto te ayuda a **ver exactamente cuánto necesitas reservar/ahorrar** en cada periodo de tiempo para cubrir tus gastos fijos y lograr con éxito tu meta de ahorro mensual.
+
+![Paso 2: Gestión de Gastos Fijos](./assets/expenses_screen.png)
 
 ### 3. Elige qué porcentaje invertirás
 Utiliza el deslizador central para determinar qué porcentaje de tu excedente de ingresos (luego de restar tus gastos correspondientes) destinarás a la inversión. Puedes configurar entre un **10%** (conservador) y un **75%** (agresivo).
@@ -33,6 +37,8 @@ Visualiza la cantidad exacta de dinero asignada a cada tipo de activo y conoce t
 ## 🔒 Privacidad y Simplicidad
 *   **100% Volátil y Seguro:** Para garantizar tu privacidad financiera absoluta, ningún dato se envía a bases de datos ni se guarda permanentemente. **Toda la información se limpia automáticamente al actualizar o cerrar la página**.
 *   **Sin Logins:** Acceso directo en Modo Invitado para un uso inmediato y seguro.
+
+![Pantalla de Bienvenida y Modo Invitado](./assets/welcome_screen.png)
 
 ---
 
