@@ -1,55 +1,50 @@
 # Money To Invest 💰
 
-**Money To Invest** es tu planificador financiero personal. Esta herramienta interactiva y privada te ayuda a visualizar tus ingresos, gestionar tus gastos fijos mensuales y estructurar un portafolio de inversión inteligente con el excedente de tu dinero.
+**Money To Invest** es una planificador financiero interactivo y privado diseñado para ayudarte a organizar tus ingresos, cubrir tus obligaciones y estructurar un portafolio de inversiones saludable.
 
 ---
 
-## 📈 ¿Cómo funciona? (Flujo de Uso)
+## 📈 Flujo del Usuario
 
-El siguiente diagrama muestra el camino sencillo para organizar tus finanzas en la aplicación:
+El siguiente diagrama ilustra la secuencia sencilla para planificar tus finanzas:
 
 ```mermaid
 graph TD
-    A[1. Entrar como Invitado] --> B[2. Ingresar tu Ingreso Bruto]
-    B -->|Define si es Diario, Semanal o Mensual| C[3. Configurar Gastos Fijos]
-    C -->|Agrega Alquiler, Comida, Servicios...| D[4. Definir Margen de Inversión]
-    D -->|Desliza para elegir entre 10% y 75%| E[5. Distribuir Portafolio]
-    E -->|Ajusta ETFs, Acciones y Cripto| F[6. Ver tu Saldo Libre de Culpa]
+    A[1. Entrar como Invitado] --> B[2. Registrar Ingresos]
+    B --> C[3. Configurar Gastos y Vistas]
+    C --> D[4. Elegir % de Inversión]
+    D --> E[5. Distribuir Portafolio]
+    E --> F[6. ¡Invierte!]
 ```
 
 ---
 
-## 📘 Guía Paso a Paso para el Usuario
+## 📘 Funcionalidad Principal
 
-Sigue estos pasos para sacar el máximo provecho de la calculadora y educar tu salud financiera:
+La herramienta se centra en cinco acciones fundamentales para ayudarte a cumplir tus metas financieras:
 
-### Paso 1: Ingresa tu Monto y Periodo
-En la pantalla principal, selecciona tu periodo de ingresos (diario, semanal o mensual) y escribe la cantidad de dinero que percibes. 
-*   *Consejo de Seguridad:* Los campos tienen un **límite máximo de 9 cifras** para evitar errores tipográficos gigantes y asegurar cálculos exactos.
+### 1. Registra tus ingresos
+Ingresa la cantidad de dinero bruto que percibes de forma rápida. Para mayor estabilidad, los montos están topados a un límite de 9 cifras enteras.
 
-### Paso 2: Administra tus Gastos Fijos
-Haz clic en la tarjeta de **Gastos Fijos** o usa el menú de navegación inferior. Aquí verás una lista por defecto de los gastos comunes (alimentación, combustible, servicios).
-*   **Modifica** los montos directamente.
-*   **Elimina** los gastos que no apliquen a tu estilo de vida.
-*   **Agrega** gastos personalizados con un concepto y una descripción rápida.
-*   *Nota:* Al hacer clic en **"Guardar y Volver"**, el sistema restará automáticamente tus gastos de tu ingreso de acuerdo al periodo seleccionado, mostrándote tu **Excedente** real (el dinero que te sobra después de pagar tus obligaciones).
+### 2. Agrega tus gastos mensuales y elige tu vista
+Configura tus compromisos financieros recurrentes (alquiler, comida, transporte, etc.) en la sección de Gastos Fijos.
+*   **Vistas Dinámicas (Diario, Semanal, Mensual):** En la pantalla principal, puedes alternar la vista entre diaria, semanal o mensual. Esto te ayuda a **ver exactamente cuánto necesitas reservar/ahorrar** en cada periodo de tiempo para cubrir tus gastos fijos y lograr con éxito tu meta de ahorro mensual.
 
-### Paso 3: Define cuánto quieres Invertir
-Usa la tarjeta interactiva central (con el porcentaje resaltado en verde) para decidir qué fracción de tu excedente quieres invertir. 
-*   Puedes arrastrar el slider entre el **10%** (inversión conservadora) y el **75%** (inversión agresiva).
+### 3. Elige qué porcentaje invertirás
+Utiliza el deslizador central para determinar qué porcentaje de tu excedente de ingresos (luego de restar tus gastos correspondientes) destinarás a la inversión. Puedes configurar entre un **10%** (conservador) y un **75%** (agresivo).
 
-### Paso 4: Distribuye tus Inversiones
-En la sección **Distribución del Portafolio**, puedes repartir tu monto de inversión en tres pilares clásicos:
-*   **ETFs (Fondos Indexados):** Inversiones diversificadas a largo plazo.
-*   **Acciones:** Participaciones en empresas específicas.
-*   **Cripto:** Activos digitales de alta volatilidad.
-*   *Lógica Inteligente:* Los tres sliders están vinculados. Al mover uno, los otros dos se adaptan de forma proporcional para asegurar que **la suma total siempre sea exactamente el 100%** de tu dinero destinado a inversión.
+### 4. Escoge la cantidad asignada para cada inversión
+Distribuye tu capital de inversión en tres pilares de activos:
+*   **ETFs (Fondos Indexados)**
+*   **Acciones**
+*   **Criptomonedas**
+*   *Lógica Inteligente:* Los tres sliders de asignación se autoajustan de forma automática y proporcional para que **la suma total sume siempre el 100%** de la inversión.
 
-### Paso 5: Conoce tu Saldo Libre de Culpa
-Al final de la pantalla, verás reflejado tu **Saldo Restante**. Este es el dinero que te queda disponible para gastar en entretenimiento, salidas o metas personales de ahorro a corto plazo. ¡Gástalo sin culpa sabiendo que tus gastos están pagados y tus inversiones del mes ya están calculadas!
+### 5. ¡Invierte!
+Visualiza la cantidad exacta de dinero asignada a cada tipo de activo y conoce tu **Saldo Restante**. Este monto final es tu dinero libre de culpa que puedes disfrutar o gastar sabiendo que tus deudas y tus planes de inversión ya están completamente cubiertos.
 
 ---
 
-## 🔒 Privacidad y Control Total
-*   **100% Privado:** Tus números y finanzas no se guardan en ningún servidor externo ni se comparten con nadie. Toda la información se guarda exclusivamente en la base de datos local de tu navegador web (`localStorage`).
-*   **Sin Registros Compilados:** Puedes usar la aplicación al instante sin formularios ni inicios de sesión tediosos.
+## 🔒 Privacidad y Simplicidad
+*   **100% Volátil y Seguro:** Para garantizar tu privacidad financiera absoluta, ningún dato se envía a bases de datos ni se guarda permanentemente. **Toda la información se limpia automáticamente al actualizar o cerrar la página**.
+*   **Sin Logins:** Acceso directo en Modo Invitado para un uso inmediato y seguro.
