@@ -50,7 +50,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
   }
 
   const { gastos } = context;
-  const [ingresoStr, setIngresoStr] = useState('4,000');
+  const [ingresoStr, setIngresoStr] = useState('');
   const [periodo, setPeriodo] = useState<'diario' | 'semanal' | 'mensual'>('mensual');
   const [porcentajeInversion, setPorcentajeInversion] = useState(31);
   const [menuVisible, setMenuVisible] = useState(false);
