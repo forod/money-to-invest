@@ -1,39 +1,55 @@
 # Money To Invest 💰
 
-Una calculadora de inversión inteligente y planificador de gastos fijos mensual de grado premium, rápida y segura, diseñada para funcionar 100% en el navegador y alojada en **GitHub Pages**.
+**Money To Invest** es tu planificador financiero personal. Esta herramienta interactiva y privada te ayuda a visualizar tus ingresos, gestionar tus gastos fijos mensuales y estructurar un portafolio de inversión inteligente con el excedente de tu dinero.
 
 ---
 
-## 📊 Arquitectura y Flujo de Datos
+## 📈 ¿Cómo funciona? (Flujo de Uso)
 
-El siguiente gráfico explica el flujo de datos seguro y local de la aplicación:
+El siguiente diagrama muestra el camino sencillo para organizar tus finanzas en la aplicación:
 
 ```mermaid
 graph TD
-    A[Pantalla de Bienvenida] -->|Comenzar como Invitado| B[Calculadora de Inversión]
-    B -->|1. Ingreso Bruto <br> Max 9 cifras / Regex| C{Cálculo de Excedente}
-    B -->|3. Sliders Vinculados <br> Suma fija 100%| D[Distribución: ETFs / Acciones / Cripto]
-    
-    C -->|Resta de Gastos Fijos| E[(Almacenamiento Local <br> localStorage)]
-    E <-->|2. Carga y Persistencia| F[Gestión de Gastos Fijos]
-    F -->|Adición / Edición / Borrado <br> Sanitizado contra XSS| E
+    A[1. Entrar como Invitado] --> B[2. Ingresar tu Ingreso Bruto]
+    B -->|Define si es Diario, Semanal o Mensual| C[3. Configurar Gastos Fijos]
+    C -->|Agrega Alquiler, Comida, Servicios...| D[4. Definir Margen de Inversión]
+    D -->|Desliza para elegir entre 10% y 75%| E[5. Distribuir Portafolio]
+    E -->|Ajusta ETFs, Acciones y Cripto| F[6. Ver tu Saldo Libre de Culpa]
 ```
 
 ---
 
-## 🔐 Pilares de Seguridad (OWASP Top 10 Web)
+## 📘 Guía Paso a Paso para el Usuario
 
-La aplicación está estructurada para mitigar riesgos cibernéticos del lado del cliente:
+Sigue estos pasos para sacar el máximo provecho de la calculadora y educar tu salud financiera:
 
-*   **A03:2021-Injection (Inyección y Sanitización):** Todos los ingresos y montos de gastos se filtran mediante expresiones regulares (`/[^0-9.]/g`) para evitar inyecciones XSS. Se aplica un **límite estricto de 9 cifras enteras** para prevenir fallos de desbordamiento de memoria y ataques de Denegación de Servicio (DoS) por sobrecarga de procesamiento en bucles de cálculo del navegador.
-*   **A02:2021-Cryptographic Failures (Datos Sensibles):** No se envían datos financieros por red ni se almacenan credenciales en bases de datos inseguras. La persistencia se realiza localmente en la máquina del usuario mediante `localStorage` de forma privada.
-*   **A05:2021-Security Misconfiguration:** Configuración estática limpia y libre de claves de desarrollo o secretos expuestos en producción.
+### Paso 1: Ingresa tu Monto y Periodo
+En la pantalla principal, selecciona tu periodo de ingresos (diario, semanal o mensual) y escribe la cantidad de dinero que percibes. 
+*   *Consejo de Seguridad:* Los campos tienen un **límite máximo de 9 cifras** para evitar errores tipográficos gigantes y asegurar cálculos exactos.
+
+### Paso 2: Administra tus Gastos Fijos
+Haz clic en la tarjeta de **Gastos Fijos** o usa el menú de navegación inferior. Aquí verás una lista por defecto de los gastos comunes (alimentación, combustible, servicios).
+*   **Modifica** los montos directamente.
+*   **Elimina** los gastos que no apliquen a tu estilo de vida.
+*   **Agrega** gastos personalizados con un concepto y una descripción rápida.
+*   *Nota:* Al hacer clic en **"Guardar y Volver"**, el sistema restará automáticamente tus gastos de tu ingreso de acuerdo al periodo seleccionado, mostrándote tu **Excedente** real (el dinero que te sobra después de pagar tus obligaciones).
+
+### Paso 3: Define cuánto quieres Invertir
+Usa la tarjeta interactiva central (con el porcentaje resaltado en verde) para decidir qué fracción de tu excedente quieres invertir. 
+*   Puedes arrastrar el slider entre el **10%** (inversión conservadora) y el **75%** (inversión agresiva).
+
+### Paso 4: Distribuye tus Inversiones
+En la sección **Distribución del Portafolio**, puedes repartir tu monto de inversión en tres pilares clásicos:
+*   **ETFs (Fondos Indexados):** Inversiones diversificadas a largo plazo.
+*   **Acciones:** Participaciones en empresas específicas.
+*   **Cripto:** Activos digitales de alta volatilidad.
+*   *Lógica Inteligente:* Los tres sliders están vinculados. Al mover uno, los otros dos se adaptan de forma proporcional para asegurar que **la suma total siempre sea exactamente el 100%** de tu dinero destinado a inversión.
+
+### Paso 5: Conoce tu Saldo Libre de Culpa
+Al final de la pantalla, verás reflejado tu **Saldo Restante**. Este es el dinero que te queda disponible para gastar en entretenimiento, salidas o metas personales de ahorro a corto plazo. ¡Gástalo sin culpa sabiendo que tus gastos están pagados y tus inversiones del mes ya están calculadas!
 
 ---
 
-## 🚀 Tecnologías
-
-*   **Core:** React 19 + TypeScript + Vite.
-*   **Diseño:** Vanilla CSS (glassmorphism moderno, diseño obsidian dark responsivo y sliders re-estilizados desde cero).
-*   **Iconos:** Lucide React.
-*   **Despliegue:** GitHub Actions CI/CD.
+## 🔒 Privacidad y Control Total
+*   **100% Privado:** Tus números y finanzas no se guardan en ningún servidor externo ni se comparten con nadie. Toda la información se guarda exclusivamente en la base de datos local de tu navegador web (`localStorage`).
+*   **Sin Registros Compilados:** Puedes usar la aplicación al instante sin formularios ni inicios de sesión tediosos.
