@@ -1,11 +1,37 @@
 import React, { useState, useContext, useMemo } from 'react';
 import { GastosContext, MONEDAS } from '../context/GastosContext';
-import { Info, Camera } from 'lucide-react';
+import { Info, Camera, Plus, Trash2 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 type Props = {
   onNavigateToGastos: () => void;
 };
+
+interface PortfolioItem {
+  id: string;
+  label: string;
+  percentage: number;
+  color: string;
+  bg: string;
+  border: string;
+}
+
+const DEFAULT_PORTFOLIO: PortfolioItem[] = [
+  { id: 'etfs', label: "ETF's", percentage: 60, color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', border: 'rgba(249, 115, 22, 0.1)' },
+  { id: 'acciones', label: 'Acciones', percentage: 25, color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)', border: 'rgba(37, 99, 235, 0.1)' },
+  { id: 'cripto', label: 'Cripto', percentage: 15, color: '#ffffff', bg: 'rgba(255, 255, 255, 0.1)', border: 'rgba(255, 255, 255, 0.05)' },
+];
+
+const PORTFOLIO_COLORS = [
+  { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.1)' }, // Yellow/Gold
+  { color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.1)' }, // Emerald Green
+  { color: '#a855f7', bg: 'rgba(168, 85, 247, 0.15)', border: 'rgba(168, 85, 247, 0.1)' }, // Purple
+  { color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)', border: 'rgba(6, 182, 212, 0.1)' }, // Cyan
+  { color: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)', border: 'rgba(236, 72, 153, 0.1)' }, // Pink
+  { color: '#84cc16', bg: 'rgba(132, 204, 22, 0.15)', border: 'rgba(132, 204, 22, 0.1)' }, // Lime Green
+  { color: '#f43f5e', bg: 'rgba(244, 63, 94, 0.15)', border: 'rgba(244, 63, 94, 0.1)' }, // Rose
+  { color: '#00ffaa', bg: 'rgba(0, 255, 170, 0.15)', border: 'rgba(0, 255, 170, 0.1)' }, // Mint Green
+];
 
 const ProgressRing = ({ radius, stroke, progress, color, backgroundColor = 'rgba(255, 255, 255, 0.05)' }: any) => {
   const normalizedRadius = radius - stroke * 2;
@@ -83,9 +109,10 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
   };
 
   // Portfolio allocation state (adds up to 100%)
-  const [percentEtfs, setPercentEtfs] = useState(60);
-  const [percentAcciones, setPercentAcciones] = useState(25);
-  const [percentCripto, setPercentCripto] = useState(15);
+  const [portfolio, setPortfolio] = useState<PortfolioItem[]>(DEFAULT_PORTFOLIO);
+  const [nuevoActivoLabel, setNuevoActivoLabel] = useState('');
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
 
   const totalGastosMensuales = useMemo(() => {
     return gastos.reduce((acc, item) => acc + (parseFloat(item.value) || 0), 0);
@@ -114,46 +141,179 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
   const montoInvertir = excedente * (porcentajeInversion / 100);
   const restante = excedente - montoInvertir;
 
-  const etfs = montoInvertir * (percentEtfs / 100);
-  const acciones = montoInvertir * (percentAcciones / 100);
-  const cripto = montoInvertir * (percentCripto / 100);
+  // Dynamic portfolio items calculate their amounts inline during rendering.
 
-  // Linked sliders logic: updates other sliders proportionally when one is adjusted
-  const handlePercentChange = (asset: 'etfs' | 'acciones' | 'cripto', newValue: number) => {
-    const current = { etfs: percentEtfs, acciones: percentAcciones, cripto: percentCripto };
-    const otherAssets = (['etfs', 'acciones', 'cripto'] as const).filter(a => a !== asset);
-    const other1 = otherAssets[0];
-    const other2 = otherAssets[1];
+  // Linked sliders logic: updates other sliders proportionally when one is adjusted (dynamic version)
+  const handlePercentChange = (id: string, newPercentage: number) => {
+    const newPct = Math.min(100, Math.max(0, newPercentage));
 
-    const valOther1 = current[other1];
-    const valOther2 = current[other2];
-    const sumOthers = valOther1 + valOther2;
+    if (portfolio.length <= 1) {
+      setPortfolio(portfolio.map(item => ({ ...item, percentage: 100 })));
+      return;
+    }
 
-    const remaining = 100 - newValue;
+    const otherItems = portfolio.filter(item => item.id !== id);
+    const sumOthers = otherItems.reduce((sum, item) => sum + item.percentage, 0);
+    const remaining = 100 - newPct;
 
-    let newValOther1, newValOther2;
-
-    if (sumOthers === 0) {
-      newValOther1 = Math.floor(remaining / 2);
-      newValOther2 = remaining - newValOther1;
+    let updatedOthers = [];
+    if (sumOthers > 0) {
+      updatedOthers = otherItems.map(item => {
+        const calculated = Math.round((item.percentage / sumOthers) * remaining);
+        return { ...item, percentage: calculated };
+      });
     } else {
-      newValOther1 = Math.round((valOther1 / sumOthers) * remaining);
-      newValOther2 = remaining - newValOther1;
+      // Distribute equally
+      const countOthers = otherItems.length;
+      updatedOthers = otherItems.map((item, idx) => {
+        const calculated = Math.floor(remaining / countOthers) + (idx < (remaining % countOthers) ? 1 : 0);
+        return { ...item, percentage: calculated };
+      });
     }
 
-    if (asset === 'etfs') {
-      setPercentEtfs(newValue);
-      setPercentAcciones(newValOther1);
-      setPercentCripto(newValOther2);
-    } else if (asset === 'acciones') {
-      setPercentAcciones(newValue);
-      setPercentEtfs(newValOther1);
-      setPercentCripto(newValOther2);
-    } else if (asset === 'cripto') {
-      setPercentCripto(newValue);
-      setPercentEtfs(newValOther1);
-      setPercentAcciones(newValOther2);
+    // Calculate current total
+    const total = newPct + updatedOthers.reduce((sum, item) => sum + item.percentage, 0);
+    let diff = 100 - total;
+
+    // Adjust the item to make it exactly 100
+    if (diff !== 0 && updatedOthers.length > 0) {
+      let largestIdx = 0;
+      for (let k = 1; k < updatedOthers.length; k++) {
+        if (updatedOthers[k].percentage > updatedOthers[largestIdx].percentage) {
+          largestIdx = k;
+        }
+      }
+      if (updatedOthers[largestIdx].percentage + diff >= 0) {
+        updatedOthers[largestIdx].percentage += diff;
+      } else {
+        updatedOthers[0].percentage = Math.max(0, updatedOthers[0].percentage + diff);
+      }
     }
+
+    // Force sum safety
+    const finalTotal = newPct + updatedOthers.reduce((sum, item) => sum + item.percentage, 0);
+    if (finalTotal !== 100) {
+      let currentDiff = 100 - finalTotal;
+      for (let k = 0; k < updatedOthers.length; k++) {
+        if (currentDiff === 0) break;
+        if (currentDiff > 0) {
+          updatedOthers[k].percentage += 1;
+          currentDiff -= 1;
+        } else if (currentDiff < 0 && updatedOthers[k].percentage > 0) {
+          updatedOthers[k].percentage -= 1;
+          currentDiff += 1;
+        }
+      }
+    }
+
+    setPortfolio(portfolio.map(item => {
+      if (item.id === id) {
+        return { ...item, percentage: newPct };
+      }
+      const found = updatedOthers.find(o => o.id === item.id);
+      return found ? found : item;
+    }));
+  };
+
+  const handleAmountChange = (id: string, text: string) => {
+    // Permitir dígitos y punto decimal
+    const cleaned = text.replace(/[^0-9.]/g, '');
+    
+    // OWASP Mitigación: Límite estricto de 9 cifras enteras
+    const parts = cleaned.split('.');
+    let intPart = parts[0];
+    if (intPart.length > 9) {
+      intPart = intPart.slice(0, 9);
+    }
+    const decPart = parts.length > 1 ? '.' + parts[1].slice(0, 2) : '';
+    const finalCleaned = intPart + decPart;
+
+    setEditingValue(finalCleaned);
+
+    const val = parseFloat(finalCleaned) || 0;
+
+    if (montoInvertir > 0) {
+      const newPct = Math.min(100, Math.max(0, Math.round((val / montoInvertir) * 100)));
+      handlePercentChange(id, newPct);
+    }
+  };
+
+  const handleAgregarActivo = () => {
+    const label = nuevoActivoLabel.trim();
+    if (!label) return;
+    if (portfolio.length >= 10) return;
+
+    // Pick color
+    const colorIndex = Math.max(0, portfolio.length - 3);
+    const colorObj = PORTFOLIO_COLORS[colorIndex % PORTFOLIO_COLORS.length];
+
+    const nuevoItem: PortfolioItem = {
+      id: `activo-${Date.now()}`,
+      label: label,
+      percentage: 0,
+      color: colorObj.color,
+      bg: colorObj.bg,
+      border: colorObj.border
+    };
+
+    setPortfolio([...portfolio, nuevoItem]);
+    setNuevoActivoLabel('');
+  };
+
+  const handleEliminarActivo = (id: string) => {
+    if (portfolio.length <= 1) return;
+
+    const itemToDelete = portfolio.find(item => item.id === id);
+    if (!itemToDelete) return;
+
+    const remainingItems = portfolio.filter(item => item.id !== id);
+    const sumRemaining = remainingItems.reduce((sum, item) => sum + item.percentage, 0);
+
+    let updatedRemaining = [];
+    if (sumRemaining > 0) {
+      updatedRemaining = remainingItems.map(item => {
+        const calculated = Math.round((item.percentage / sumRemaining) * 100);
+        return { ...item, percentage: calculated };
+      });
+    } else {
+      const countRemaining = remainingItems.length;
+      updatedRemaining = remainingItems.map((item, idx) => {
+        const calculated = Math.floor(100 / countRemaining) + (idx < (100 % countRemaining) ? 1 : 0);
+        return { ...item, percentage: calculated };
+      });
+    }
+
+    // Adjust sum to exactly 100
+    const total = updatedRemaining.reduce((sum, item) => sum + item.percentage, 0);
+    let diff = 100 - total;
+
+    if (diff !== 0 && updatedRemaining.length > 0) {
+      let largestIdx = 0;
+      for (let k = 1; k < updatedRemaining.length; k++) {
+        if (updatedRemaining[k].percentage > updatedRemaining[largestIdx].percentage) {
+          largestIdx = k;
+        }
+      }
+      updatedRemaining[largestIdx].percentage += diff;
+    }
+
+    // Force sum safety
+    const finalTotal = updatedRemaining.reduce((sum, item) => sum + item.percentage, 0);
+    if (finalTotal !== 100) {
+      let currentDiff = 100 - finalTotal;
+      for (let k = 0; k < updatedRemaining.length; k++) {
+        if (currentDiff === 0) break;
+        if (currentDiff > 0) {
+          updatedRemaining[k].percentage += 1;
+          currentDiff -= 1;
+        } else if (currentDiff < 0 && updatedRemaining[k].percentage > 0) {
+          updatedRemaining[k].percentage -= 1;
+          currentDiff += 1;
+        }
+      }
+    }
+
+    setPortfolio(updatedRemaining);
   };
 
   // OWASP A03:2021 Sanitization and length restriction to 9 digits (9 integers max)
@@ -492,158 +652,190 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
               Distribución del Portafolio
             </span>
 
-            {/* ETF's */}
-            <div style={{ 
-              height: '76px', 
-              backgroundColor: 'var(--color-etfs-bg)', 
-              borderRadius: '16px', 
-              overflow: 'hidden', 
-              marginBottom: '16px',
-              position: 'relative',
-              border: '1px solid rgba(249, 115, 22, 0.1)'
-            }}>
-              <div style={{ 
-                backgroundColor: 'var(--color-etfs)', 
-                width: `${percentEtfs}%`, 
-                height: '100%', 
-                position: 'absolute', 
-                left: 0, 
-                top: 0,
-                opacity: 0.85,
-                transition: 'width 0.3s ease-out'
-              }} />
-              <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%', padding: '0 20px' }}>
-                <div>
-                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#ffffff', display: 'block', fontFamily: 'var(--font-title)' }}>ETF's</span>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{percentEtfs}%</span>
-                </div>
-                <span className="font-outfit" style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>
-                  {moneda.symbol} {formatWithCommas(etfs.toFixed(0))}
-                </span>
-              </div>
-              {!capturing && (
-                <input
-                  id="slider-etfs"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={percentEtfs}
-                  onChange={(e) => handlePercentChange('etfs', parseInt(e.target.value))}
-                  style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    width: '100%', 
-                    height: '100%', 
-                    opacity: 0, 
-                    cursor: 'ew-resize',
-                    zIndex: 3
-                  }}
-                />
-              )}
-            </div>
+            {portfolio.map((item) => {
+              const itemMonto = montoInvertir * (item.percentage / 100);
+              const isEditing = editingItemId === item.id;
+              const displayValue = isEditing ? editingValue : formatWithCommas(itemMonto.toFixed(0));
 
-            {/* Acciones */}
-            <div style={{ 
-              height: '76px', 
-              backgroundColor: 'var(--color-acciones-bg)', 
-              borderRadius: '16px', 
-              overflow: 'hidden', 
-              marginBottom: '16px',
-              position: 'relative',
-              border: '1px solid rgba(37, 99, 235, 0.1)'
-            }}>
-              <div style={{ 
-                backgroundColor: 'var(--color-acciones)', 
-                width: `${percentAcciones}%`, 
-                height: '100%', 
-                position: 'absolute', 
-                left: 0, 
-                top: 0,
-                opacity: 0.85,
-                transition: 'width 0.3s ease-out'
-              }} />
-              <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%', padding: '0 20px' }}>
-                <div>
-                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#ffffff', display: 'block', fontFamily: 'var(--font-title)' }}>Acciones</span>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{percentAcciones}%</span>
-                </div>
-                <span className="font-outfit" style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>
-                  {moneda.symbol} {formatWithCommas(acciones.toFixed(0))}
-                </span>
-              </div>
-              {!capturing && (
-                <input
-                  id="slider-acciones"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={percentAcciones}
-                  onChange={(e) => handlePercentChange('acciones', parseInt(e.target.value))}
+              return (
+                <div 
+                  key={item.id}
                   style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    width: '100%', 
-                    height: '100%', 
-                    opacity: 0, 
-                    cursor: 'ew-resize',
-                    zIndex: 3
+                    height: '76px', 
+                    backgroundColor: item.bg, 
+                    borderRadius: '16px', 
+                    overflow: 'hidden', 
+                    marginBottom: '16px',
+                    position: 'relative',
+                    border: `1px solid ${item.border}`
                   }}
-                />
-              )}
-            </div>
+                >
+                  <div style={{ 
+                    backgroundColor: item.color, 
+                    width: `${item.percentage}%`, 
+                    height: '100%', 
+                    position: 'absolute', 
+                    left: 0, 
+                    top: 0,
+                    opacity: item.id === 'cripto' ? 0.25 : 0.85,
+                    transition: 'width 0.3s ease-out'
+                  }} />
+                  <div style={{ 
+                    position: 'relative', 
+                    zIndex: 4, 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    height: '100%', 
+                    padding: '0 16px' 
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {!capturing && portfolio.length > 1 && (
+                        <button
+                          onClick={() => handleEliminarActivo(item.id)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'rgba(255, 255, 255, 0.4)',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'color 0.2s',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-red)'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.4)'}
+                          title="Eliminar activo"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                      <div>
+                        <span style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff', display: 'block', fontFamily: 'var(--font-title)' }}>
+                          {item.label}
+                        </span>
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>
+                          {item.percentage}%
+                        </span>
+                      </div>
+                    </div>
 
-            {/* Cripto */}
-            <div style={{ 
-              height: '76px', 
-              backgroundColor: 'var(--color-cripto-bg)', 
-              borderRadius: '16px', 
-              overflow: 'hidden', 
-              marginBottom: '20px',
-              position: 'relative',
-              border: '1px solid rgba(255, 255, 255, 0.05)'
-            }}>
-              <div style={{ 
-                backgroundColor: 'var(--color-cripto)', 
-                width: `${percentCripto}%`, 
-                height: '100%', 
-                position: 'absolute', 
-                left: 0, 
-                top: 0,
-                opacity: 0.25,
-                transition: 'width 0.3s ease-out'
-              }} />
-              <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%', padding: '0 20px' }}>
-                <div>
-                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#ffffff', display: 'block', fontFamily: 'var(--font-title)' }}>Cripto</span>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{percentCripto}%</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontSize: '18px', fontWeight: '800', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
+                        {moneda.symbol}
+                      </span>
+                      {capturing ? (
+                        <span className="font-outfit" style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>
+                          {displayValue}
+                        </span>
+                      ) : (
+                        <input
+                          type="text"
+                          value={displayValue}
+                          onChange={(e) => handleAmountChange(item.id, e.target.value)}
+                          onFocus={() => {
+                            setEditingItemId(item.id);
+                            setEditingValue(itemMonto > 0 ? itemMonto.toFixed(0) : '');
+                          }}
+                          onBlur={() => {
+                            setEditingItemId(null);
+                            setEditingValue('');
+                          }}
+                          disabled={montoInvertir === 0}
+                          placeholder="0"
+                          maxLength={12}
+                          style={{
+                            background: 'rgba(0, 0, 0, 0.25)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '8px',
+                            color: '#ffffff',
+                            fontSize: '18px',
+                            fontWeight: '800',
+                            fontFamily: 'var(--font-title)',
+                            width: '100px',
+                            textAlign: 'right',
+                            padding: '4px 8px',
+                            outline: 'none',
+                            transition: 'border-color 0.2s',
+                          }}
+                          onFocusCapture={(e) => e.target.style.borderColor = 'var(--accent-green)'}
+                          onBlurCapture={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  {!capturing && (
+                    <input
+                      id={`slider-${item.id}`}
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={item.percentage}
+                      onChange={(e) => handlePercentChange(item.id, parseInt(e.target.value))}
+                      style={{ 
+                        position: 'absolute', 
+                        top: 0, 
+                        left: 0, 
+                        width: '100%', 
+                        height: '100%', 
+                        opacity: 0, 
+                        cursor: 'ew-resize',
+                        zIndex: 3
+                      }}
+                    />
+                  )}
                 </div>
-                <span className="font-outfit" style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>
-                  {moneda.symbol} {formatWithCommas(cripto.toFixed(0))}
-                </span>
-              </div>
-              {!capturing && (
+              );
+            })}
+
+            {/* Agregar nuevo activo */}
+            {!capturing && portfolio.length < 10 && (
+              <div style={{ 
+                display: 'flex', 
+                gap: '8px', 
+                marginTop: '20px', 
+                padding: '12px', 
+                borderRadius: '12px', 
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.04)' 
+              }}>
                 <input
-                  id="slider-cripto"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={percentCripto}
-                  onChange={(e) => handlePercentChange('cripto', parseInt(e.target.value))}
-                  style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    width: '100%', 
-                    height: '100%', 
-                    opacity: 0, 
-                    cursor: 'ew-resize',
-                    zIndex: 3
+                  type="text"
+                  placeholder="Ej: Oro, Bienes Raíces..."
+                  value={nuevoActivoLabel}
+                  onChange={(e) => setNuevoActivoLabel(e.target.value)}
+                  maxLength={25}
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: '13px',
+                    padding: '8px 12px',
+                    flex: 1,
+                    outline: 'none'
                   }}
                 />
-              )}
-            </div>
+                <button
+                  onClick={handleAgregarActivo}
+                  className="btn-secondary"
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '13px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'rgba(0, 255, 170, 0.1)',
+                    borderColor: 'rgba(0, 255, 170, 0.2)',
+                    color: 'var(--accent-green)'
+                  }}
+                >
+                  <Plus size={14} />
+                  Agregar
+                </button>
+              </div>
+            )}
 
             {/* Bloque Restante */}
             <div style={{ 
