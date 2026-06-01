@@ -4,7 +4,7 @@
 
 ---
 
-## 📘 Funcionalidad Principal
+## 📘 ¿Cómo usarlo?
 
 La herramienta se centra en cinco acciones fundamentales para ayudarte a cumplir tus metas financieras:
 
