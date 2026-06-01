@@ -100,71 +100,85 @@ export default function Gastos({ onBack }: Props) {
             </span>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
-              {gastos.map((campo) => (
-                <div 
-                  key={campo.id} 
-                  style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    background: 'rgba(255, 255, 255, 0.02)', 
-                    padding: '14px 16px', 
-                    borderRadius: '16px',
-                    border: '1px solid rgba(255, 255, 255, 0.04)',
-                    transition: 'background 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'}
-                >
-                  <div style={{ flex: 1, paddingRight: '12px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', display: 'block' }}>{campo.label}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginTop: '2px' }}>{campo.desc}</span>
-                  </div>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '6px 12px', borderRadius: '10px' }}>
-                    <span style={{ color: 'var(--accent-blue)', fontWeight: '700', fontSize: '13px' }}>S/</span>
-                    <input
-                      id={`input-gasto-${campo.id}`}
-                      type="text"
-                      value={formatWithCommas(campo.value)}
-                      onChange={(e) => handleChange(campo.id, e.target.value)}
-                      placeholder="0"
-                      maxLength={13} // 9 digits + 2 commas + 2 decimals if any
+              {gastos.length === 0 ? (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '40px 20px', 
+                  color: 'var(--text-secondary)', 
+                  fontSize: '13px', 
+                  border: '1px dashed rgba(255,255,255,0.06)', 
+                  borderRadius: '16px',
+                  background: 'rgba(255,255,255,0.01)'
+                }}>
+                  No hay gastos fijos registrados. Agrega uno nuevo en el formulario de la derecha.
+                </div>
+              ) : (
+                gastos.map((campo) => (
+                  <div 
+                    key={campo.id} 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      background: 'rgba(255, 255, 255, 0.02)', 
+                      padding: '14px 16px', 
+                      borderRadius: '16px',
+                      border: '1px solid rgba(255, 255, 255, 0.04)',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'}
+                  >
+                    <div style={{ flex: 1, paddingRight: '12px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', display: 'block' }}>{campo.label}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginTop: '2px' }}>{campo.desc}</span>
+                    </div>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '6px 12px', borderRadius: '10px' }}>
+                      <span style={{ color: 'var(--accent-blue)', fontWeight: '700', fontSize: '13px' }}>S/</span>
+                      <input
+                        id={`input-gasto-${campo.id}`}
+                        type="text"
+                        value={formatWithCommas(campo.value)}
+                        onChange={(e) => handleChange(campo.id, e.target.value)}
+                        placeholder="0"
+                        maxLength={13} // 9 digits + 2 commas + 2 decimals if any
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#ffffff',
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          textAlign: 'right',
+                          width: '80px',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+
+                    <button
+                      id={`btn-eliminar-gasto-${campo.id}`}
+                      onClick={() => handleDeleteGasto(campo.id)}
                       style={{
                         background: 'transparent',
                         border: 'none',
-                        color: '#ffffff',
-                        fontSize: '14px',
-                        fontWeight: '700',
-                        textAlign: 'right',
-                        width: '80px',
-                        outline: 'none'
+                        color: 'var(--accent-red)',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        marginLeft: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        opacity: 0.6,
+                        transition: 'opacity 0.2s'
                       }}
-                    />
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = '0.6'}
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-
-                  <button
-                    id={`btn-eliminar-gasto-${campo.id}`}
-                    onClick={() => handleDeleteGasto(campo.id)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--accent-red)',
-                      cursor: 'pointer',
-                      padding: '4px',
-                      marginLeft: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      opacity: 0.6,
-                      transition: 'opacity 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.6'}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Total Indicator */}
