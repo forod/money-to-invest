@@ -1,21 +1,6 @@
 # Money To Invest 💰
 
-**Money To Invest** es una planificador financiero interactivo y privado diseñado para ayudarte a organizar tus ingresos, cubrir tus obligaciones y estructurar un portafolio de inversiones saludable.
-
----
-
-## 📈 Flujo del Usuario
-
-El siguiente diagrama ilustra la secuencia sencilla para planificar tus finanzas:
-
-```mermaid
-graph TD
-    A[1. Entrar como Invitado] --> B[2. Registrar Ingresos]
-    B --> C[3. Configurar Gastos y Vistas]
-    C --> D[4. Elegir % de Inversión]
-    D --> E[5. Distribuir Portafolio]
-    E --> F[6. ¡Invierte!]
-```
+**Money To Invest** es un planificador financiero interactivo y privado diseñado para ayudarte a organizar tus ingresos, cubrir tus obligaciones y estructurar un portafolio de inversiones saludable.
 
 ---
 
@@ -48,3 +33,14 @@ Visualiza la cantidad exacta de dinero asignada a cada tipo de activo y conoce t
 ## 🔒 Privacidad y Simplicidad
 *   **100% Volátil y Seguro:** Para garantizar tu privacidad financiera absoluta, ningún dato se envía a bases de datos ni se guarda permanentemente. **Toda la información se limpia automáticamente al actualizar o cerrar la página**.
 *   **Sin Logins:** Acceso directo en Modo Invitado para un uso inmediato y seguro.
+
+---
+
+## 🗺️ Flujo Simplificado de Uso
+
+Sigue esta secuencia horizontal para organizar tu dinero en la aplicación:
+
+```mermaid
+graph LR
+    A[1. Registrar Ingresos] --> B[2. Configurar Gastos] --> C[3. Elegir Inversión] --> D[4. Distribuir Portafolio] --> E[5. ¡Invierte!]
+```
