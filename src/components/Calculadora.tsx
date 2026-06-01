@@ -689,7 +689,8 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
                     height: '100%', 
-                    padding: '0 16px' 
+                    padding: '0 16px',
+                    pointerEvents: 'none' // Let clicks and drags pass through to the slider underneath
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {!capturing && portfolio.length > 1 && (
@@ -705,6 +706,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                             alignItems: 'center',
                             justifyContent: 'center',
                             transition: 'color 0.2s',
+                            pointerEvents: 'auto' // Re-enable pointer events for the button
                           }}
                           onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-red)'}
                           onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.4)'}
@@ -760,6 +762,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                             padding: '4px 8px',
                             outline: 'none',
                             transition: 'border-color 0.2s',
+                            pointerEvents: 'auto' // Re-enable pointer events for the input field
                           }}
                           onFocusCapture={(e) => e.target.style.borderColor = 'var(--accent-green)'}
                           onBlurCapture={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
