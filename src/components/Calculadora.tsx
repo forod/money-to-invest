@@ -16,21 +16,23 @@ interface PortfolioItem {
   border: string;
 }
 
-const DEFAULT_PORTFOLIO: PortfolioItem[] = [
-  { id: 'etfs', label: "ETF's", percentage: 60, color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', border: 'rgba(249, 115, 22, 0.1)' },
-  { id: 'acciones', label: 'Acciones', percentage: 25, color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)', border: 'rgba(37, 99, 235, 0.1)' },
-  { id: 'cripto', label: 'Cripto', percentage: 15, color: '#ffffff', bg: 'rgba(255, 255, 255, 0.1)', border: 'rgba(255, 255, 255, 0.05)' },
+const PORTFOLIO_COLORS = [
+  { color: '#0F9885', bg: 'rgba(15, 152, 133, 0.15)', border: 'rgba(15, 152, 133, 0.1)' },
+  { color: '#F47D14', bg: 'rgba(244, 125, 20, 0.15)', border: 'rgba(244, 125, 20, 0.1)' },
+  { color: '#9C99E1', bg: 'rgba(156, 153, 225, 0.15)', border: 'rgba(156, 153, 225, 0.1)' },
+  { color: '#FB6D79', bg: 'rgba(251, 109, 121, 0.15)', border: 'rgba(251, 109, 121, 0.1)' },
+  { color: '#CA3A8A', bg: 'rgba(202, 58, 138, 0.15)', border: 'rgba(202, 58, 138, 0.1)' },
+  { color: '#286BCF', bg: 'rgba(40, 107, 207, 0.15)', border: 'rgba(40, 107, 207, 0.1)' },
+  { color: '#C09A83', bg: 'rgba(192, 154, 131, 0.15)', border: 'rgba(192, 154, 131, 0.1)' },
+  { color: '#71DCC4', bg: 'rgba(113, 220, 196, 0.15)', border: 'rgba(113, 220, 196, 0.1)' },
+  { color: '#8D262C', bg: 'rgba(141, 38, 44, 0.15)', border: 'rgba(141, 38, 44, 0.1)' },
+  { color: '#FBC020', bg: 'rgba(251, 192, 32, 0.15)', border: 'rgba(251, 192, 32, 0.1)' },
 ];
 
-const PORTFOLIO_COLORS = [
-  { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.1)' }, // Yellow/Gold
-  { color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.1)' }, // Emerald Green
-  { color: '#a855f7', bg: 'rgba(168, 85, 247, 0.15)', border: 'rgba(168, 85, 247, 0.1)' }, // Purple
-  { color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)', border: 'rgba(6, 182, 212, 0.1)' }, // Cyan
-  { color: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)', border: 'rgba(236, 72, 153, 0.1)' }, // Pink
-  { color: '#84cc16', bg: 'rgba(132, 204, 22, 0.15)', border: 'rgba(132, 204, 22, 0.1)' }, // Lime Green
-  { color: '#f43f5e', bg: 'rgba(244, 63, 94, 0.15)', border: 'rgba(244, 63, 94, 0.1)' }, // Rose
-  { color: '#00ffaa', bg: 'rgba(0, 255, 170, 0.15)', border: 'rgba(0, 255, 170, 0.1)' }, // Mint Green
+const DEFAULT_PORTFOLIO: PortfolioItem[] = [
+  { id: 'etfs', label: "ETF's", percentage: 60, color: '#F47D14', bg: 'rgba(244, 125, 20, 0.15)', border: 'rgba(244, 125, 20, 0.1)' },
+  { id: 'acciones', label: 'Acciones', percentage: 25, color: '#286BCF', bg: 'rgba(40, 107, 207, 0.15)', border: 'rgba(40, 107, 207, 0.1)' },
+  { id: 'cripto', label: 'Cripto', percentage: 15, color: '#9C99E1', bg: 'rgba(156, 153, 225, 0.15)', border: 'rgba(156, 153, 225, 0.05)' },
 ];
 
 const ProgressRing = ({ radius, stroke, progress, color, backgroundColor = 'rgba(255, 255, 255, 0.05)' }: any) => {
@@ -243,9 +245,9 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
     if (!label) return;
     if (portfolio.length >= 10) return;
 
-    // Pick color
-    const colorIndex = Math.max(0, portfolio.length - 3);
-    const colorObj = PORTFOLIO_COLORS[colorIndex % PORTFOLIO_COLORS.length];
+    // Pick first unused color from the palette, or fallback to index cycling
+    const colorObj = PORTFOLIO_COLORS.find(c => !portfolio.some(item => item.color.toLowerCase() === c.color.toLowerCase()))
+      || PORTFOLIO_COLORS[portfolio.length % PORTFOLIO_COLORS.length];
 
     const nuevoItem: PortfolioItem = {
       id: `activo-${Date.now()}`,
