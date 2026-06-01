@@ -17,7 +17,7 @@ export default function Gastos({ onBack }: Props) {
     return <div style={{ color: 'white', padding: '20px' }}>Error: GastosContext no provisto</div>;
   }
 
-  const { gastos, setGastos } = context;
+  const { gastos, setGastos, moneda } = context;
 
   const formatWithCommas = (num: number | string) => {
     if (num === undefined || num === null) return '';
@@ -135,7 +135,7 @@ export default function Gastos({ onBack }: Props) {
                     </div>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '6px 12px', borderRadius: '10px' }}>
-                      <span style={{ color: 'var(--accent-blue)', fontWeight: '700', fontSize: '13px' }}>S/</span>
+                      <span style={{ color: 'var(--accent-blue)', fontWeight: '700', fontSize: '13px' }}>{moneda.symbol}</span>
                       <input
                         id={`input-gasto-${campo.id}`}
                         type="text"
@@ -192,7 +192,7 @@ export default function Gastos({ onBack }: Props) {
             }}>
               <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-secondary)' }}>TOTAL GASTOS:</span>
               <span className="font-outfit" style={{ fontSize: '22px', fontWeight: '800', color: 'var(--accent-blue)' }}>
-                S/ {formatWithCommas(calcularTotal().toFixed(2))}
+                {moneda.symbol} {formatWithCommas(calcularTotal().toFixed(2))}
               </span>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function Gastos({ onBack }: Props) {
               <div>
                 <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', fontWeight: '600' }}>Monto Mensual</label>
                 <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '0 16px' }}>
-                  <span style={{ color: 'var(--accent-green)', fontWeight: '700', fontSize: '15px', marginRight: '8px' }}>S/</span>
+                  <span style={{ color: 'var(--accent-green)', fontWeight: '700', fontSize: '15px', marginRight: '8px' }}>{moneda.symbol}</span>
                   <input
                     id="input-nuevo-gasto-monto"
                     type="text"

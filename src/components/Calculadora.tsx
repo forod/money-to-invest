@@ -1,5 +1,5 @@
 import React, { useState, useContext, useMemo } from 'react';
-import { GastosContext } from '../context/GastosContext';
+import { GastosContext, MONEDAS } from '../context/GastosContext';
 import { Info, Camera } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
@@ -50,11 +50,12 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
     return <div style={{ color: 'white', padding: '20px' }}>Error: GastosContext no provisto</div>;
   }
 
-  const { gastos } = context;
+  const { gastos, moneda, setMoneda } = context;
   const [ingresoStr, setIngresoStr] = useState('');
   const [periodo, setPeriodo] = useState<'diario' | 'semanal' | 'mensual'>('mensual');
   const [porcentajeInversion, setPorcentajeInversion] = useState(31);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [monedaMenuVisible, setMonedaMenuVisible] = useState(false);
   const [capturing, setCapturing] = useState(false);
 
   const handleDownloadScreenshot = async () => {
@@ -241,59 +242,113 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
               <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '700', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                 Ingresa un monto
               </span>
-              <div style={{ position: 'relative' }}>
-                <button 
-                  id="btn-periodo"
-                  className="btn-secondary" 
-                  onClick={() => setMenuVisible(!menuVisible)}
-                  style={{ padding: '6px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                >
-                  {periodo.charAt(0).toUpperCase() + periodo.slice(1)}
-                  <span style={{ fontSize: '8px' }}>▼</span>
-                </button>
-                {menuVisible && (
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: '32px', 
-                    right: 0, 
-                    backgroundColor: '#0d141e', 
-                    borderRadius: '12px', 
-                    padding: '6px', 
-                    zIndex: 100, 
-                    border: '1px solid var(--card-border)', 
-                    width: '110px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
-                  }}>
-                    {['diario', 'semanal', 'mensual'].map((p) => (
-                      <button
-                        key={p}
-                        id={`btn-periodo-${p}`}
-                        onClick={() => { setPeriodo(p as any); setMenuVisible(false); }}
-                        style={{ 
-                          width: '100%', 
-                          background: 'transparent', 
-                          border: 'none', 
-                          color: periodo === p ? 'var(--accent-green)' : 'var(--text-primary)', 
-                          padding: '8px', 
-                          textAlign: 'left', 
-                          cursor: 'pointer',
-                          fontSize: '13px',
-                          borderRadius: '6px',
-                          transition: 'background 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                      >
-                        {p.charAt(0).toUpperCase() + p.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {/* Selector de Moneda */}
+                <div style={{ position: 'relative' }}>
+                  <button 
+                    id="btn-moneda"
+                    className="btn-secondary" 
+                    onClick={() => { setMonedaMenuVisible(!monedaMenuVisible); setMenuVisible(false); }}
+                    style={{ padding: '6px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    {moneda.code}
+                    <span style={{ fontSize: '8px' }}>▼</span>
+                  </button>
+                  {monedaMenuVisible && (
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '32px', 
+                      right: 0, 
+                      backgroundColor: '#0d141e', 
+                      borderRadius: '12px', 
+                      padding: '6px', 
+                      zIndex: 100, 
+                      border: '1px solid var(--card-border)', 
+                      width: '130px',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                    }}>
+                      {MONEDAS.map((m) => (
+                        <button
+                          key={m.code}
+                          id={`btn-moneda-${m.code}`}
+                          onClick={() => { setMoneda(m); setMonedaMenuVisible(false); }}
+                          style={{ 
+                            width: '100%', 
+                            background: 'transparent', 
+                            border: 'none', 
+                            color: moneda.code === m.code ? 'var(--accent-green)' : 'var(--text-primary)', 
+                            padding: '8px', 
+                            textAlign: 'left', 
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            borderRadius: '6px',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                        >
+                          {m.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Selector de Periodo */}
+                <div style={{ position: 'relative' }}>
+                  <button 
+                    id="btn-periodo"
+                    className="btn-secondary" 
+                    onClick={() => { setMenuVisible(!menuVisible); setMonedaMenuVisible(false); }}
+                    style={{ padding: '6px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    {periodo.charAt(0).toUpperCase() + periodo.slice(1)}
+                    <span style={{ fontSize: '8px' }}>▼</span>
+                  </button>
+                  {menuVisible && (
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '32px', 
+                      right: 0, 
+                      backgroundColor: '#0d141e', 
+                      borderRadius: '12px', 
+                      padding: '6px', 
+                      zIndex: 100, 
+                      border: '1px solid var(--card-border)', 
+                      width: '110px',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                    }}>
+                      {['diario', 'semanal', 'mensual'].map((p) => (
+                        <button
+                          key={p}
+                          id={`btn-periodo-${p}`}
+                          onClick={() => { setPeriodo(p as any); setMenuVisible(false); }}
+                          style={{ 
+                            width: '100%', 
+                            background: 'transparent', 
+                            border: 'none', 
+                            color: periodo === p ? 'var(--accent-green)' : 'var(--text-primary)', 
+                            padding: '8px', 
+                            textAlign: 'left', 
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            borderRadius: '6px',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                        >
+                          {p.charAt(0).toUpperCase() + p.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px' }}>
-              <span style={{ fontSize: '32px', fontWeight: '300', color: 'var(--text-secondary)', marginRight: '8px', fontFamily: 'var(--font-title)' }}>S/</span>
+              <span style={{ fontSize: '32px', fontWeight: '300', color: 'var(--text-secondary)', marginRight: '8px', fontFamily: 'var(--font-title)' }}>{moneda.symbol}</span>
               <input
                 id="input-ingresos"
                 className="font-outfit"
@@ -324,7 +379,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
               <div>
                 <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Gastos Fijos</span>
                 <span style={{ fontSize: '16px', fontWeight: '700', display: 'block', marginTop: '2px', fontFamily: 'var(--font-title)' }}>
-                  S/ {formatWithCommas(gastosPorPeriodo.toFixed(0))}
+                  {moneda.symbol} {formatWithCommas(gastosPorPeriodo.toFixed(0))}
                 </span>
               </div>
             </div>
@@ -335,7 +390,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
               <div>
                 <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Excedente</span>
                 <span style={{ fontSize: '16px', fontWeight: '700', display: 'block', marginTop: '2px', color: 'var(--accent-green)', fontFamily: 'var(--font-title)' }}>
-                  S/ {formatWithCommas(excedente.toFixed(0))}
+                  {moneda.symbol} {formatWithCommas(excedente.toFixed(0))}
                 </span>
               </div>
             </div>
@@ -365,7 +420,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
             </div>
             
             <h3 className="font-outfit" style={{ fontSize: '38px', fontWeight: '800', lineHeight: '1', color: '#05080c', margin: '10px 0 20px 0' }}>
-              S/ {formatWithCommas(montoInvertir.toFixed(2))}
+              {moneda.symbol} {formatWithCommas(montoInvertir.toFixed(2))}
             </h3>
             
             <input 
@@ -420,7 +475,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{percentEtfs}%</span>
                 </div>
                 <span className="font-outfit" style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>
-                  S/ {formatWithCommas(etfs.toFixed(0))}
+                  {moneda.symbol} {formatWithCommas(etfs.toFixed(0))}
                 </span>
               </div>
               <input
@@ -469,7 +524,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{percentAcciones}%</span>
                 </div>
                 <span className="font-outfit" style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>
-                  S/ {formatWithCommas(acciones.toFixed(0))}
+                  {moneda.symbol} {formatWithCommas(acciones.toFixed(0))}
                 </span>
               </div>
               <input
@@ -518,7 +573,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{percentCripto}%</span>
                 </div>
                 <span className="font-outfit" style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff' }}>
-                  S/ {formatWithCommas(cripto.toFixed(0))}
+                  {moneda.symbol} {formatWithCommas(cripto.toFixed(0))}
                 </span>
               </div>
               <input
@@ -550,7 +605,7 @@ export default function Calculadora({ onNavigateToGastos }: Props) {
               backgroundColor: 'rgba(0, 255, 170, 0.02)' 
             }}>
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                Disfruta de tus <strong style={{ color: 'var(--accent-green)', fontWeight: '700', fontFamily: 'var(--font-title)', fontSize: '15px' }}>S/ {formatWithCommas(restante.toFixed(2))}</strong> restantes
+                Disfruta de tus <strong style={{ color: 'var(--accent-green)', fontWeight: '700', fontFamily: 'var(--font-title)', fontSize: '15px' }}>{moneda.symbol} {formatWithCommas(restante.toFixed(2))}</strong> restantes
               </span>
             </div>
           </div>
